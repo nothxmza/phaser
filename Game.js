@@ -151,7 +151,7 @@ class Game extends Phaser.Scene {
 		this.megaBomb = this.physics.add.group();
 
 		this.physics.add.collider(this.megaBomb, this.platforms);
-		this.physics.add.collider(this.player, this.megaBomb, this.hitBomb,null, this);
+		this.physics.add.collider(this.player, this.megaBomb, this.megaBomb,null, this);
 
 		//Text round
 		this.roundText =  this.add.text(this.widthWindow / 2, this.heightWindow / 2 - 100, "Round 1", { fontSize: '64px', fill: 'white' })
@@ -261,6 +261,18 @@ class Game extends Phaser.Scene {
 			return;
 		}
 
+		this.physics.pause();
+
+		this.player.setTint(0xff0000);
+
+		this.player.anims.play('turn');
+
+		this.gameOver = true;
+		this.gameOverText.setVisible(true)
+		this.retryButton.setVisible(true)
+	}
+
+	megaBomb(player, bomb) {
 		this.physics.pause();
 
 		this.player.setTint(0xff0000);
