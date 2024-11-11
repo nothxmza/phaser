@@ -1,9 +1,21 @@
 class Menu extends Phaser.Scene {
     constructor() {
         super({key:'Menu'});
+
+        this.menuSound;
+    }
+
+
+    preload() {
+
+        this.load.audio('menuSound', 'assets/menuSound.mp3');
     }
 
     create() {
+
+        this.menuSound = this.sound.add('menuSound');
+        this.menuSound.play();
+
         const playButton = this.add.text(400, 250, 'JOUER', {
             fill: 'white'
         })
@@ -17,10 +29,12 @@ class Menu extends Phaser.Scene {
         .setInteractive();
 
         playButton.on('pointerdown', () => {
+            this.menuSound.stop();
             this.scene.start('Game');
         });
 
         settingsButton.on('pointerdown', () => {
+            this.menuSound.stop();
             this.scene.start('Settings');
         });
 

@@ -18,6 +18,12 @@ class Game extends Phaser.Scene {
 		this.statusShield;
 		this.shield;
 		this.hasShield = false;
+		this.bombSound;
+		this.ambientSound;
+		this.shieldSound;
+		this.starsSound;
+		this.loseSound;
+		this.victorySound;
 	}
 
 	preload() {
@@ -28,10 +34,18 @@ class Game extends Phaser.Scene {
 		this.load.image("megaBomb", 'assets/Mega_Bomb.png');
 		this.load.spritesheet('dude', 'assets/dude1.png', { frameWidth: 32, frameHeight: 40 });
 		this.load.image('shield', 'assets/shield.png');
+		this.load.audio('bombSound', 'assets/bombSound.mp3');
+		this.load.audio('ambientSound', 'assets/ambientSound.mp3');
+		this.load.audio('shieldSound', 'assets/shieldSound.mp3');
+		this.load.audio('starsSound', 'assets/starsSound.mp3');
+		this.load.audio('loseSound', 'assets/loseSound.mp3');
+		this.load.audio('victorySound', 'assets/victorySound.mp3');
 	}
 
 	create() {
 
+		this.sound.volume = 1;
+		console.log('Mute status:', this.sound.mute)
 		let settingsScene = this.scene.get('Settings');
         if (settingsScene) {
             this.keyBindings = settingsScene.getKeyBindings();
@@ -51,6 +65,13 @@ class Game extends Phaser.Scene {
 		background.displayHeight = this.sys.game.config.height;
 		// this.add.image(400, 300, 'sky');
 
+		this.bombSound = this.sound.add('bombSound', { volume: 0.2 });
+		this.ambientSound = this.sound.add('ambientSound', { volume: 0.3, loop: true });
+		this.shieldSound = this.sound.add('shieldSound', { volume: 0.5 });
+		this.starsSound = this.sound.add('starsSound', { volume: 0.5 });
+		this.loseSound = this.sound.add('loseSound', { volume: 0.6 });
+		this.victorySound = this.sound.add('victorySound', { volume: 0.6 });
+		this.ambientSound.play();
 
 		this.returnButton = this.add.text(this.widthWindow - 50, 50, 'Retour', {
 			fontSize: '18px',
@@ -151,7 +172,7 @@ class Game extends Phaser.Scene {
 		this.megaBomb = this.physics.add.group();
 
 		this.physics.add.collider(this.megaBomb, this.platforms);
-		this.physics.add.collider(this.player, this.megaBomb, this.megaBomb,null, this);
+		this.physics.add.collider(this.player, this.megaBomb, this.hitMegaBomb,null, this);
 
 		//Text round
 		this.roundText =  this.add.text(this.widthWindow / 2, this.heightWindow / 2 - 100, "Round 1", { fontSize: '64px', fill: 'white' })
@@ -213,6 +234,7 @@ class Game extends Phaser.Scene {
 		star.disableBody(true, true);
 		this.score += 10;
 		this.scoreText.setText('score: ' + this.score);
+		this.starsSound.play();
 
 		if (this.stars.countActive(true) === 0)
 		{
@@ -256,15 +278,17 @@ class Game extends Phaser.Scene {
 			this.statusShield.fillStyle(0xFFFFFF, 1);
 			this.statusShield.fillRect(10, 50, 200, 20);
 			this.hasShield = false;
-
+			this.bombSound.play();
 			bomb.destroy();
 			return;
 		}
 
+		this.bombSound.play();
 		this.physics.pause();
 
-		this.player.setTint(0xff0000);
 
+		this.player.setTint(0xff0000);
+		this.loseSound.play();
 		this.player.anims.play('turn');
 
 		this.gameOver = true;
@@ -272,11 +296,12 @@ class Game extends Phaser.Scene {
 		this.retryButton.setVisible(true)
 	}
 
-	megaBomb(player, bomb) {
+	hitMegaBomb(player, bomb) {
+		this.bombSound.play();
 		this.physics.pause();
 
 		this.player.setTint(0xff0000);
-
+		this.loseSound.play();
 		this.player.anims.play('turn');
 
 		this.gameOver = true;
@@ -300,12 +325,14 @@ class Game extends Phaser.Scene {
 
 	showVictory(stop) {
 		stop.physics.pause();
+		this.victorySound.play();
 		this.gameOver = true;
 		this.victoryText.setVisible(true);
 		this.retryButton.setVisible(true)
 	}
 
 	collectShield(player, shield) {
+		this.shieldSound.play();
 		shield.disableBody(true, true);
 		this.hasShield = true;
 		this.statusShield.fillStyle(0x0000FF, 1);
@@ -313,6 +340,7 @@ class Game extends Phaser.Scene {
 	}
 
 	returnToMenu() {
+		this.ambientSound.stop();
 		this.scene.start('Menu');
 	}
 	

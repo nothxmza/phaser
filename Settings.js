@@ -2,14 +2,21 @@ class Settings extends Phaser.Scene {
     constructor() {
         super('Settings');
         this.keyBindings = {
-            left: 'ArrowLeft',
-            right: 'ArrowRight',
-            up: 'ArrowUp',
-            down: 'ArrowDown'
+            left: Phaser.Input.Keyboard.KeyCodes.A,  
+            right: Phaser.Input.Keyboard.KeyCodes.D, 
+            up: Phaser.Input.Keyboard.KeyCodes.W,    
+            down: Phaser.Input.Keyboard.KeyCodes.S  
         };
+        this.menuSound;
+    }
+
+    preload() {
+        this.load.audio('menuSound', 'assets/menuSound.mp3');
     }
 
     create() {
+        this.menuSound = this.sound.add('menuSound');
+        this.menuSound.play();
         this.add.text(400, 100, 'Paramètres des touches', {
             fontSize: '32px',
             fill: 'white'
@@ -35,6 +42,7 @@ class Settings extends Phaser.Scene {
             fill: 'white'
         }).setOrigin(0.5).setInteractive();
         backButton.on('pointerdown', () => {
+            this.menuSound.stop();
             this.scene.start('Menu');
         });
 
@@ -50,13 +58,28 @@ class Settings extends Phaser.Scene {
 
         this.input.keyboard.on('keydown', (event) => {
             if (this.changingKey) {
-                this.keyBindings[this.changingKey] = event.key;
-                this.updateKeyText(this.changingKey, event.key);
+                this.keyBindings[this.changingKey] = event.keyCode;
+                this.updateKeyText(this.changingKey, this.getKeyName(event.keyCode));
                 this.changingKey = null;
             }
         });
 
         this.changingKey = null;
+    }
+
+    getKeyName(keyCode) {
+        switch (keyCode) {
+            case Phaser.Input.Keyboard.KeyCodes.LEFT:
+                return 'ArrowLeft';
+            case Phaser.Input.Keyboard.KeyCodes.RIGHT:
+                return 'ArrowRight';
+            case Phaser.Input.Keyboard.KeyCodes.UP:
+                return 'ArrowUp';
+            case Phaser.Input.Keyboard.KeyCodes.DOWN:
+                return 'ArrowDown';
+            default:
+                return 'Unknown';
+        }
     }
 
     changeKey(direction) {
