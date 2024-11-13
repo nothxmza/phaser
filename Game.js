@@ -24,16 +24,18 @@ class Game extends Phaser.Scene {
 		this.starsSound;
 		this.loseSound;
 		this.victorySound;
+		this.ghost;
 	}
 
 	preload() {
 		this.load.image('sky', 'assets/fond.png');
-		this.load.image('ground', 'assets/platform2.png');
+		this.load.image('ground', 'assets/platform.png');
 		this.load.image('star', 'assets/star.png');
 		this.load.image('bomb', 'assets/bomb.png');
 		this.load.image("megaBomb", 'assets/Mega_Bomb.png');
 		this.load.spritesheet('dude', 'assets/dude1.png', { frameWidth: 32, frameHeight: 40 });
 		this.load.image('shield', 'assets/shield.png');
+		this.load.image('ghost', 'assets/ghost.png');
 		this.load.audio('bombSound', 'assets/bombSound.mp3');
 		this.load.audio('ambientSound', 'assets/ambientSound.mp3');
 		this.load.audio('shieldSound', 'assets/shieldSound.mp3');
@@ -82,23 +84,48 @@ class Game extends Phaser.Scene {
 		.on('pointerdown', () => this.returnToMenu());
 
 
+		this.ghost = this.physics.add.sprite(0, this.heightWindow- 100, 'ghost');
+		this.ghost.setBounce(0.2);
+		this.ghost.setCollideWorldBounds(true);
+		this.ghost.setVisible(false);
+		
+		
+
 		this.platforms = this.physics.add.staticGroup();
 
 		this.platforms.create(0, this.heightWindow, 'ground').setScale(this.widthWindow, 1).refreshBody();
 
+		let mouvementP1 = this.platforms.create(300, 550, 'ground').setScale(0.1, 2).refreshBody();
+		this.tweens.add({
+			targets: mouvementP1,
+			x: 500,
+			duration: 3000,
+			ease: 'Linear',
+			yoyo: true,
+			repeat: -1
+		});
 		this.platforms.create(600, 400, 'ground');
 		this.platforms.create(50, 650, 'ground');
-		this.platforms.create(300, 550, 'ground').setScale(0.1, 2).refreshBody();
 		this.platforms.create(370, 260, 'ground').setScale(0.1, 2).refreshBody();
 		this.platforms.create(100, 460, 'ground').setScale(0.1, 2).refreshBody();
 		this.platforms.create(200, 300, 'ground').setScale(0.1, 2).refreshBody();
 		this.platforms.create(1000, 300, 'ground').setScale(0.1, 2).refreshBody();
-		this.platforms.create(1250, 400, 'ground').setScale(0.5,1).refreshBody();
+		let mouvementP2 =  this.platforms.create(1250, 400, 'ground').setScale(0.5,1).refreshBody();
+		this.tweens.add({
+			targets: mouvementP2,
+			x: 1000,
+			duration: 3000,
+			ease: 'Linear',
+			yoyo: true,
+			repeat: -1
+		});
+
 		this.platforms.create(650, 220, 'ground');
 		this.platforms.create(120, 120, 'ground');
 		this.platforms.create(970, 560, 'ground');
 		this.platforms.create(1300, 740, 'ground');
 		this.platforms.create(600, 700, 'ground');
+		this.physics.add.collider(this.ghost, this.platforms);
 
 		this.player = this.physics.add.sprite(100, 450, 'dude');
 
@@ -126,6 +153,9 @@ class Game extends Phaser.Scene {
 		});
 
 		this.physics.add.collider(this.player, this.platforms);
+
+		this.physics.add.collider(this.player, this.ghost, this.hitGhost,null, this);
+		// this.physics.add.collider(this.player, this.movingPlatform1);
 
 		// this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -165,6 +195,10 @@ class Game extends Phaser.Scene {
 
 		///Les bombes
 		this.bombs = this.physics.add.group();
+		let bomb = this.bombs.create(1000, 1, 'bomb');
+		bomb.setBounce(1);
+		bomb.setCollideWorldBounds(true);
+		bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
 
 		this.physics.add.collider(this.bombs, this.platforms);
 		this.physics.add.collider(this.player, this.bombs, this.hitBomb,null, this);
@@ -238,7 +272,7 @@ class Game extends Phaser.Scene {
 
 		if (this.stars.countActive(true) === 0)
 		{
-			if(this.round === 2){
+			if(this.round === 3){
 				this.showVictory(this)
 			}else{
 				this.round += 1;
@@ -262,6 +296,17 @@ class Game extends Phaser.Scene {
 				bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);//la vitesse
 	
 				if(this.round === 2){
+					this.ghost.setVisible(true);
+					this.tweens.add({
+						targets: this.ghost,
+						x: this.widthWindow,
+						duration: 5000,
+						ease: 'Linear',
+						yoyo: true,
+						repeat: -1
+					});
+				}
+				if(this.round === 3){
 					let megaB = this.megaBomb.create(x, 1, 'megaBomb');
 					megaB.setBounce(1);
 					megaB.setCollideWorldBounds(true);
@@ -309,6 +354,17 @@ class Game extends Phaser.Scene {
 		this.retryButton.setVisible(true)
 	}
 
+	hitGhost(player, ghost) {
+		this.physics.pause();
+
+		this.player.setTint(0xff0000);
+		this.loseSound.play();
+		this.player.anims.play('turn');
+
+		this.gameOver = true;
+		this.gameOverText.setVisible(true)
+		this.retryButton.setVisible(true)
+	}
 	restartGame(scene) {
 		this.gameOver = false;
 		this.score = 0;

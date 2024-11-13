@@ -3,6 +3,8 @@ class Menu extends Phaser.Scene {
         super({key:'Menu'});
 
         this.menuSound;
+        this.widthWindow = window.innerWidth;
+		this.heightWindow = window.innerHeight;
     }
 
 
@@ -16,13 +18,13 @@ class Menu extends Phaser.Scene {
         this.menuSound = this.sound.add('menuSound');
         this.menuSound.play();
 
-        const playButton = this.add.text(400, 250, 'JOUER', {
+        const playButton = this.add.text(this.widthWindow / 2, this.heightWindow / 2 - 100, 'JOUER', {
             fill: 'white'
         })
         .setOrigin(0.5)
         .setInteractive();
 
-        const settingsButton = this.add.text(400, 350, 'PARAMÈTRES', {
+        const settingsButton = this.add.text(this.widthWindow / 2, this.heightWindow / 2, 'PARAMÈTRES', {
             fill: 'white'
         })
         .setOrigin(0.5)

@@ -2,10 +2,10 @@ class Settings extends Phaser.Scene {
     constructor() {
         super('Settings');
         this.keyBindings = {
-            left: Phaser.Input.Keyboard.KeyCodes.A,  
-            right: Phaser.Input.Keyboard.KeyCodes.D, 
-            up: Phaser.Input.Keyboard.KeyCodes.W,    
-            down: Phaser.Input.Keyboard.KeyCodes.S  
+            left: Phaser.Input.Keyboard.KeyCodes.LEFT,  
+            right: Phaser.Input.Keyboard.KeyCodes.RIGHT, 
+            up: Phaser.Input.Keyboard.KeyCodes.UP,    
+            down: Phaser.Input.Keyboard.KeyCodes.DOWN  
         };
         this.menuSound;
     }
@@ -77,6 +77,26 @@ class Settings extends Phaser.Scene {
                 return 'ArrowUp';
             case Phaser.Input.Keyboard.KeyCodes.DOWN:
                 return 'ArrowDown';
+            case Phaser.Input.Keyboard.KeyCodes.SPACE:
+                return 'Space';
+            case Phaser.Input.Keyboard.KeyCodes.ENTER:
+                return 'Enter';
+            case Phaser.Input.Keyboard.KeyCodes.SHIFT:
+                return 'Shift';
+            case Phaser.Input.Keyboard.KeyCodes.Q:
+                return 'Q';
+            case Phaser.Input.Keyboard.KeyCodes.W:
+                return 'W';
+            case Phaser.Input.Keyboard.KeyCodes.E:
+                return 'E';
+            case Phaser.Input.Keyboard.KeyCodes.D:
+                return 'D';
+            case Phaser.Input.Keyboard.KeyCodes.A:
+                return 'A';
+            case Phaser.Input.Keyboard.KeyCodes.S:
+                return 'S';
+            case Phaser.Input.Keyboard.KeyCodes.D:
+                return 'D';
             default:
                 return 'Unknown';
         }
